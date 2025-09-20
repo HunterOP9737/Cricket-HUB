@@ -16,12 +16,12 @@
       color: #1e90ff;
       margin: 20px 0;
     }
-    iframe {
+    video {
       width: 95%;
       height: 250px;
-      border: none;
       border-radius: 10px;
       margin: 10px 0;
+      background: #000;
     }
     .section {
       margin: 20px 0;
@@ -55,8 +55,8 @@
 
   <h1>CricketHUB</h1>
 
-  <!-- Iframe for streaming -->
-  <iframe id="streamFrame" src="" allowfullscreen></iframe>
+  <!-- Video Player -->
+  <video id="videoPlayer" controls autoplay></video>
 
   <!-- Hindi Quality Buttons -->
   <div class="section">
@@ -77,25 +77,35 @@
   <!-- Telegram -->
   <a class="telegram" href="https://t.me/asiacuplive_match" target="_blank">Join us on Telegram</a>
 
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
+    const video = document.getElementById('videoPlayer');
+    let hls;
+
     function setStream(url) {
-      document.getElementById("streamFrame").src = url;
+      if (Hls.isSupported()) {
+        if (hls) hls.destroy();
+        hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
+      }
 
       // active button highlight
       document.querySelectorAll(".btn").forEach(btn => btn.classList.remove("active"));
       event.target.classList.add("active");
     }
 
-    // ✅ Auto-load Hindi 1080p when page opens
+    // ✅ Auto-load Hindi 1080p on page load
     window.onload = function() {
-      let defaultUrl = "https://dish.slivcdn.com/hls/live/2020591/TEN3HD/master_3500.m3u8";
-      document.getElementById("streamFrame").src = defaultUrl;
+      setStream('https://dish.slivcdn.com/hls/live/2020591/TEN3HD/master_3500.m3u8');
       document.getElementById("hindi1080").classList.add("active");
     }
   </script>
 
   <script>
-    // Optional Telegram popup
+    // Telegram popup
     if (confirm("Join Our Telegram Channel @CricketHUB") == true) {
       window.open("https://t.me/asiacuplive_match", '_blank');
     }
