@@ -1,115 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CricketHUB</title>
-  <style>
-    body {
-      margin: 0;
-      background: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-    h1 {
-      color: #1e90ff;
-      margin: 20px 0;
-    }
-    video {
-      width: 95%;
-      height: 250px;
-      border-radius: 10px;
-      margin: 10px 0;
-      background: #000;
-    }
-    .section {
-      margin: 20px 0;
-    }
-    .btn {
-      padding: 10px 20px;
-      margin: 5px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-      background: #444;
-      color: #fff;
-    }
-    .btn.active {
-      background: #1e90ff;
-    }
-    .telegram {
-      display: inline-block;
-      margin: 20px 0;
-      padding: 12px 25px;
-      background: #1e90ff;
-      color: white;
-      text-decoration: none;
-      border-radius: 25px;
-      font-size: 18px;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Video Player</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+body{margin:0;background:#000;color:#fff;font-family:Arial;text-align:center;}
+video{width:95%;max-width:1000px;height:60vh;margin:12px auto;display:block;background:#000;border-radius:8px}
+button{padding:10px 16px;margin:6px;border-radius:6px;background:#444;color:#fff;border:none;cursor:pointer}
+button.active{background:#1db954}
+</style>
 </head>
 <body>
 
-  <h1>CricketHUB</h1>
+<h2>Cricket Stream</h2>
+<video id="video" controls autoplay playsinline muted></video>
+<div>
+<button onclick="setStream(HINDI_1080, this)">Hindi 1080p</button>
+<button onclick="setStream(HINDI_720, this)">Hindi 720p</button>
+<button onclick="setStream(ENG_1080, this)">Eng 1080p</button>
+<button onclick="setStream(ENG_720, this)">Eng 720p</button>
+</div>
 
-  <!-- Video Player -->
-  <video id="videoPlayer" controls autoplay></video>
+<script>
+const PROXY_BASE = 'https://late-haze-5e52.ophunter9737.workers.dev/'; // Replace with your Worker URL
+const HINDI_1080 = 'https://dish.slivcdn.com/hls/live/2020591/TEN3HD/master_3500.m3u8';
+const HINDI_720  = 'https://dish.slivcdn.com/hls/live/2020591/TEN3HD/master_2000.m3u8';
+const ENG_1080   = 'https://dish.slivcdn.com/hls/live/2011747/TEN1HD/master_3500.m3u8';
+const ENG_720    = 'https://dish.slivcdn.com/hls/live/2011747/TEN1HD/master_2000.m3u8';
 
-  <!-- Hindi Quality Buttons -->
-  <div class="section">
-    <h2>Hindi</h2>
-    <button class="btn" id="hindi1080" onclick="setStream('https://dish.slivcdn.com/hls/live/2020591/TEN3HD/master_3500.m3u8')">1080p</button>
-    <button class="btn" onclick="setStream('https://dish.slivcdn.com/hls/live/2020591/TEN3HD/master_2000.m3u8')">720p</button>
-    <button class="btn" onclick="setStream('https://dish.slivcdn.com/hls/live/2020591/TEN3HD/master_664.m3u8')">360p</button> 
-  </div>
+const video = document.getElementById('video');
+let hls;
 
-  <!-- English Quality Buttons -->
-  <div class="section">
-    <h2>English</h2>
-    <button class="btn" onclick="setStream('https://dish.slivcdn.com/hls/live/2011747/TEN1HD/master_3500.m3u8')">1080p</button>
-    <button class="btn" onclick="setStream('https://dish.slivcdn.com/hls/live/2011747/TEN1HD/master_2000.m3u8')">720p</button>
-    <button class="btn" onclick="setStream('https://dish.slivcdn.com/hls/live/2011747/TEN1HD/master_664.m3u8')">360p</button>
-  </div>
+function proxiedUrl(upstream){ return PROXY_BASE + encodeURIComponent(upstream); }
 
-  <!-- Telegram -->
-  <a class="telegram" href="https://t.me/asiacuplive_match" target="_blank">Join us on Telegram</a>
+function setStream(upstream, btn){
+  const final = proxiedUrl(upstream);
+  if(Hls.isSupported()){
+    if(hls) hls.destroy();
+    hls = new Hls();
+    hls.loadSource(final);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, ()=>video.play().catch(()=>{}));
+  } else if(video.canPlayType('application/vnd.apple.mpegurl')){
+    video.src = final;
+  } else alert('HLS not supported');
 
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <script>
-    const video = document.getElementById('videoPlayer');
-    let hls;
+  document.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
 
-    function setStream(url) {
-      if (Hls.isSupported()) {
-        if (hls) hls.destroy();
-        hls = new Hls();
-        hls.loadSource(url);
-        hls.attachMedia(video);
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url;
-      }
-
-      // active button highlight
-      document.querySelectorAll(".btn").forEach(btn => btn.classList.remove("active"));
-      event.target.classList.add("active");
-    }
-
-    // ✅ Auto-load Hindi 1080p on page load
-    window.onload = function() {
-      setStream('https://dish.slivcdn.com/hls/live/2020591/TEN3HD/master_3500.m3u8');
-      document.getElementById("hindi1080").classList.add("active");
-    }
-  </script>
-
-  <script>
-    // Telegram popup
-    if (confirm("Join Our Telegram Channel @CricketHUB") == true) {
-      window.open("https://t.me/asiacuplive_match", '_blank');
-    }
-  </script>
+// Auto load default
+window.addEventListener('load', ()=>setStream(HINDI_1080));
+</script>
 
 </body>
 </html>
