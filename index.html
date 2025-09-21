@@ -1,60 +1,102 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cricket Stream</title>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<style>
-body{margin:0;background:#000;color:#fff;font-family:Arial;text-align:center;}
-video{width:95%;max-width:1000px;height:60vh;margin:12px auto;display:block;background:#000;border-radius:8px}
-button{padding:10px 16px;margin:6px;border-radius:6px;background:#444;color:#fff;border:none;cursor:pointer}
-button.active{background:#1db954}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Cricket Stream</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0d0d0d;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    header {
+      background: #1e90ff;
+      padding: 15px;
+      font-size: 22px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    iframe {
+      width: 95%;
+      height: 500px;
+      border: none;
+      border-radius: 12px;
+      margin: 20px 0;
+      box-shadow: 0 0 15px rgba(30,144,255,0.5);
+    }
+    .btn-group {
+      margin: 20px 0;
+    }
+    .btn {
+      background: #222;
+      border: none;
+      padding: 10px 18px;
+      margin: 5px;
+      border-radius: 8px;
+      font-size: 16px;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: #1e90ff;
+    }
+    .btn.active {
+      background: #28a745;
+    }
+    footer {
+      margin: 25px 0;
+      font-size: 14px;
+      color: #aaa;
+    }
+    .telegram {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 12px 20px;
+      background: #1e90ff;
+      color: #fff;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .telegram:hover {
+      background: #0c6cd4;
+    }
+  </style>
 </head>
 <body>
 
-<h2>Cricket Stream</h2>
-<video id="video" controls autoplay playsinline muted></video>
-<div>
-<button onclick="setStream(HINDI_1080, this)">Hindi 1080p</button>
-<button onclick="setStream(HINDI_720, this)">Hindi 720p</button>
-<button onclick="setStream(ENG_1080, this)">Eng 1080p</button>
-<button onclick="setStream(ENG_720, this)">Eng 720p</button>
-</div>
+  <header>📺 Live Cricket Stream</header>
 
-<script>
-const PROXY_BASE = 'https://crickethub.ophunter9737.workers.dev/?url='; // Replace with your Worker URL
+  <!-- Stream Player -->
+  <iframe 
+    id="streamFrame" 
+    src="https://iframe.sportsstream.workers.dev/?url=https%3A%2F%2Fcricketstan.github.io%2FChannel-13%2F" 
+    allowfullscreen>
+  </iframe>
 
-const HINDI_1080 = 'https://dish.slivcdn.com/hls/live/2020591/TEN3HD/master_3500.m3u8';
-const HINDI_720  = 'https://dish.slivcdn.com/hls/live/2020591/TEN3HD/master_2000.m3u8';
-const ENG_1080   = 'https://dish.slivcdn.com/hls/live/2011747/TEN1HD/master_3500.m3u8';
-const ENG_720    = 'https://dish.slivcdn.com/hls/live/2011747/TEN1HD/master_2000.m3u8';
+  <!-- Channel Switch Buttons -->
+  <div class="btn-group">
+    <button class="btn active" onclick="setStream('https://iframe.sportsstream.workers.dev/?url=https%3A%2F%2Fcricketstan.github.io%2FChannel-13%2F', this)">Channel 13</button>
+    <button class="btn" onclick="setStream('https://iframe.sportsstream.workers.dev/?url=https%3A%2F%2Fcricketstan.github.io%2FChannel-14%2F', this)">Channel 14</button>
+    <button class="btn" onclick="setStream('https://iframe.sportsstream.workers.dev/?url=https%3A%2F%2Fcricketstan.github.io%2FChannel-15%2F', this)">Channel 15</button>
+  </div>
 
-const video = document.getElementById('video');
-let hls;
+  <!-- Telegram Join -->
+  <a class="telegram" href="https://t.me/asiacuplive_match" target="_blank">Join our Telegram 🚀</a>
 
-function proxiedUrl(upstream){ return PROXY_BASE + encodeURIComponent(upstream); }
+  <footer>© 2025 CricketHub | All Rights Reserved</footer>
 
-function setStream(upstream, btn){
-  const final = proxiedUrl(upstream);
-  if(Hls.isSupported()){
-    if(hls) hls.destroy();
-    hls = new Hls();
-    hls.loadSource(final);
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, ()=>video.play().catch(()=>{}));
-  } else if(video.canPlayType('application/vnd.apple.mpegurl')){
-    video.src = final;
-  } else alert('HLS not supported');
-
-  document.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-}
-
-// Auto load default
-window.addEventListener('load', ()=>setStream(HINDI_1080));
-</script>
+  <script>
+    function setStream(url, btn) {
+      document.getElementById("streamFrame").src = url;
+      document.querySelectorAll(".btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    }
+  </script>
 
 </body>
 </html>
